@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 export interface Profile {
   id: string;
@@ -40,8 +40,12 @@ export class ProfilesService {
     return this.profiles;
   }
 
-  findOne(id: string): Profile | undefined {
-    return this.profiles.find((profile) => profile.id === id);
+  findOne(id: string): Profile  {
+    const matchingProfile = this.profiles.find((profile) => profile.id === id);
+    if(!matchingProfile) {
+      throw new NotFoundException(`Profile with ID ${id} not found`);
+    }
+    return matchingProfile;
   }
 
   create(name: string, description: string): Profile {
@@ -57,7 +61,7 @@ export class ProfilesService {
   update(id: string, data: Partial<Pick<Profile, 'name' | 'description'>>): Profile | undefined {
     const index = this.profiles.findIndex((p) => p.id === id);
     if (index === -1) {
-      return undefined; // or throw new NotFoundException()
+      throw new NotFoundException(`Profile with ID ${id} not found`);
     }
   
     this.profiles[index] = {
@@ -67,12 +71,13 @@ export class ProfilesService {
   
     return this.profiles[index];
   }
-  
+
   remove(id: string): void {
     const index = this.profiles.findIndex((p) => p.id === id);
-    if (index !== -1) {
-      this.profiles.splice(index, 1);
+    if (index === -1) {
+      throw new NotFoundException(`Profile with ID ${id} not found`);
     }
+      this.profiles.splice(index, 1);
   }
 }
 
