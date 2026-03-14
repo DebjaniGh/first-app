@@ -1,30 +1,41 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { ProfilesService } from './profiles.service';
+import { CreateProfileDto } from './create-profile.dto';
 
 @Controller('profiles')
 export class ProfilesController {
-  // This is where all our routes are defined
-  // GET /profiles
-  @Get()
-  //   findAll() {
-  //     return [];
-  //   }
-  // example 1 of query
-  //   findAll(@Query('age') age: number) {
-  //     return [{ age }];
-  //   }
+  constructor(private readonly profilesService: ProfilesService) {}
 
-  // example 2 of query
-  findAll(@Query('location') location: string) {
-    return [{ location }];
+  // GET /profiles/
+  @Get()
+  findAll() {
+    return this.profilesService.findAll();
   }
 
-  // example of param
+  // GET /profiles/:id
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return { id };
+    return this.profilesService.findOne(id);
   }
-  // GET /profiles/:id
+  
   // POST /profiles
+  @Post()
+  create(@Body() createProfileDto: CreateProfileDto) {
+    const {name, description} = createProfileDto;
+    return this.profilesService.create(name, description);
+  }
+
   // PUT /profiles/:id
+  @Put(':id')
+  update(@Param('id') id: string, @Body() createProfileDto: CreateProfileDto) {
+    const {name, description} = createProfileDto;
+    return this.profilesService.update(id, name, description);
+  }
+
   // DELETE /profiles/:id
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    this.profilesService.remove(id);
+    return { message: 'Profile deleted successfully' };
+  }
 }
