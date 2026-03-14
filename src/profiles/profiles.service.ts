@@ -54,19 +54,20 @@ export class ProfilesService {
     return profile;
   }
 
-  update(id: string, name: string, description: string): Profile | undefined {
-   const index = this.profiles.findIndex((p) => p.id === id);
-   if (index !== -1) {
+  update(id: string, data: Partial<Pick<Profile, 'name' | 'description'>>): Profile | undefined {
+    const index = this.profiles.findIndex((p) => p.id === id);
+    if (index === -1) {
+      return undefined; // or throw new NotFoundException()
+    }
+  
     this.profiles[index] = {
       ...this.profiles[index],
-      name,
-      description,
+      ...data,
     };
+  
     return this.profiles[index];
-   }
-   return undefined;
   }
-
+  
   remove(id: string): void {
     const index = this.profiles.findIndex((p) => p.id === id);
     if (index !== -1) {

@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@nestjs/common';
 import { ProfilesService } from './profiles.service';
 import { CreateProfileDto } from './create-profile.dto';
+import { UpdateProfileDto } from './update-profile.dto';
 
 @Controller('profiles')
 export class ProfilesController {
@@ -27,9 +28,12 @@ export class ProfilesController {
 
   // PUT /profiles/:id
   @Put(':id')
-  update(@Param('id') id: string, @Body() createProfileDto: CreateProfileDto) {
+  put(
+    @Param('id') id: string, 
+    @Body() createProfileDto: CreateProfileDto // all fields are required
+  ) {
     const {name, description} = createProfileDto;
-    return this.profilesService.update(id, name, description);
+    return this.profilesService.update(id, createProfileDto);
   }
 
   // DELETE /profiles/:id
@@ -38,4 +42,13 @@ export class ProfilesController {
     this.profilesService.remove(id);
     return { message: 'Profile deleted successfully' };
   }
+
+  // PATCH /profiles/:id
+  @Patch(':id')
+  patch(
+    @Param('id') id: string, 
+    @Body() updateProfileDto: UpdateProfileDto // only name or description can be updated
+  ) {
+    return this.profilesService.update(id, updateProfileDto);
+  }  
 }
